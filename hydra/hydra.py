@@ -1,4 +1,8 @@
 # Copyright (C) 2017 O.S. Systems Software LTDA.
 # This software is released under the MIT License
 
-from .hydra import Hydra
+from . import oauth2
+
+
+class Hydra(oauth2.Client):
+    pass
