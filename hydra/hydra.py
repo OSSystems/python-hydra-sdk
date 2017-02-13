@@ -2,7 +2,11 @@
 # This software is released under the MIT License
 
 from . import oauth2
+from .clients import ClientManager
 
 
 class Hydra(oauth2.Client):
-    pass
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.clients = ClientManager(self)
