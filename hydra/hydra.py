@@ -3,6 +3,7 @@
 
 from . import oauth2
 from .clients import ClientManager
+from .jwk import JWKManager
 
 
 class Hydra(oauth2.Client):
@@ -10,3 +11,4 @@ class Hydra(oauth2.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.clients = ClientManager(self)
+        self.jwk = JWKManager(self)
