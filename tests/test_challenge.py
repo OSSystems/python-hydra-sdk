@@ -32,17 +32,17 @@ class ChallengeTestCase(unittest.TestCase):
             self.challenge_data, jwk.to_rsa(), algorithm='RS256')
 
     def test_can_decode_challenge(self):
-        challenge = self.hydra.challenge(self.challenge)
-        self.assertEqual(challenge.data, self.challenge_data)
+        challenge = self.hydra.challenge_decode(self.challenge)
+        self.assertEqual(challenge, self.challenge_data)
 
     def test_can_encode_challenge(self):
-        challenge = self.hydra.challenge(self.challenge)
-        response = challenge.encode(sub='foo', uname='bar', at_ext=self.ext)
-        decoded = json.loads(
+        response = self.hydra.challenge_encode(
+            self.challenge_data, sub='foo', uname='bar', at_ext=self.ext)
+        challenge = json.loads(
             base64.urlsafe_b64decode(response.split('.')[1] + '==').decode())
-        self.assertEqual(decoded['sub'], 'foo')
-        self.assertEqual(decoded['uname'], 'bar')
-        self.assertIsNotNone(decoded['iat'])
-        self.assertEqual(decoded['aud'], self.aud)
-        self.assertEqual(decoded['at_ext'], self.ext)
-        self.assertEqual(decoded['scp'], self.scp)
+        self.assertEqual(challenge['sub'], 'foo')
+        self.assertEqual(challenge['uname'], 'bar')
+        self.assertIsNotNone(challenge['iat'])
+        self.assertEqual(challenge['aud'], self.aud)
+        self.assertEqual(challenge['at_ext'], self.ext)
+        self.assertEqual(challenge['scp'], self.scp)
