@@ -13,10 +13,19 @@ def hydra_fixture():
         yield
         return
     client = docker.from_env()
-    env = {'FORCE_ROOT_CLIENT_CREDENTIALS': 'client:secret'}
+    env = {
+        'FORCE_ROOT_CLIENT_CREDENTIALS': 'client:secret',
+        'DATABASE_URL': 'memory',
+    }
     ports = {'4444/tcp': 4444}
+    entrypoint = '/go/bin/hydra host --dangerous-force-http'
     container = client.containers.run(
-        'hydra_demo', detach=True, environment=env, ports=ports)
+        'oryd/hydra',
+        detach=True,
+        environment=env,
+        ports=ports,
+        entrypoint=entrypoint,
+    )
     for line in container.logs(stream=True):
         if b'Setting up http server on :4444' in line:
             break

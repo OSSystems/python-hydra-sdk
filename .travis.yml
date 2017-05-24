@@ -1,0 +1,31 @@
+sudo: required
+
+language: python
+
+python:
+  - 3.5
+  - 3.6
+
+services:
+  - docker
+
+env:
+  - PYTHON_HYDRA_LOCAL=1
+
+before_install:
+  - >
+    docker run -d
+    -p 4444:4444
+    -e 'DATABASE_URL=memory'
+    -e 'FORCE_ROOT_CLIENT_CREDENTIALS=client:secret'
+    --entrypoint='/go/bin/hydra'
+    oryd/hydra
+    host --dangerous-force-http
+
+install: pip install tox python-coveralls
+
+script:
+  - tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d .)
+
+after_success:
+  - coveralls
