@@ -1,11 +1,14 @@
 # Copyright (C) 2017 O.S. Systems Software LTDA.
 # This software is released under the MIT License
 
+import json
 import unittest
+from unittest.mock import patch
 
 from Crypto.PublicKey.RSA import _RSAobj
 
 from hydra import Hydra, JWK
+from hydra.exceptions import HydraResponseError, HydraRequestError
 
 
 class JWKTestCase(unittest.TestCase):
@@ -73,3 +76,28 @@ class JWKManagerTestCase(unittest.TestCase):
         self.assertEqual(key.type, JWK.PUBLIC)
         self.assertIsNotNone(key.n)
         self.assertIsNotNone(key.e)
+
+    @patch('requests.request')
+    def test_raises_error_with_bad_request(self, request):
+        request.return_value.ok = False
+        with self.assertRaises(HydraRequestError):
+            self.hydra.jwk.get('hydra.consent.challenge', 'public')
+
+    @patch('requests.request')
+    def test_raises_error_when_bad_response_content_type(self, request):
+        effects = [{}, json.JSONDecodeError('', '', 0)]
+        request.return_value.json.side_effect = effects
+        with self.assertRaises(HydraResponseError):
+            self.hydra.jwk.get('hydra.consent.challenge', 'public')
+
+    @patch('requests.request')
+    def test_raises_error_when_bad_response_content(self, request):
+        request.return_value.json.return_value = {}
+        with self.assertRaises(HydraResponseError):
+            self.hydra.jwk.get('hydra.consent.challenge', 'public')
+
+    @patch('requests.request')
+    def test_raises_error_when_no_keys_are_provided(self, request):
+        request.return_value.json.return_value = {'keys': []}
+        with self.assertRaises(HydraResponseError):
+            self.hydra.jwk.get('hydra.consent.challenge', 'public')

@@ -2,10 +2,12 @@
 # This software is released under the MIT License
 
 import base64
+import json
 
 from Crypto.PublicKey import RSA
 
 from .base import HydraManager
+from .exceptions import HydraResponseError, HydraRequestError
 
 
 class JWK:
@@ -46,5 +48,17 @@ class JWKManager(HydraManager):
     def get(self, key, type_):
         path = '/keys/{}/{}'.format(key, type_)
         response = self.hydra.request('GET', path, scope='hydra.keys.get')
-        if response.ok:
-            return JWK(**response.json()['keys'][0])
+        if not response.ok:
+            raise HydraRequestError('Request to get JWK failed.')
+        try:
+            jwk = response.json()['keys'][0]
+        except json.decoder.JSONDecodeError:
+            raise HydraResponseError(
+                'Bad response content type (expected JSON)')
+        except KeyError:
+            raise HydraResponseError(
+                'Bad response content (expected to have a keys key)')
+        except IndexError:
+            raise HydraResponseError('Bad response (empty key set)')
+        else:
+            return JWK(**jwk)
