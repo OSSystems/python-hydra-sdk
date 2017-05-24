@@ -1,4 +1,4 @@
-# Python Hydra SDK
+# Python Hydra SDK [![Build Status](https://travis-ci.org/OSSystems/python-hydra-sdk.svg?branch=master)](https://travis-ci.org/OSSystems/python-hydra-sdk) [![Coverage Status](https://coveralls.io/repos/github/OSSystems/python-hydra-sdk/badge.svg?branch=master)](https://coveralls.io/github/OSSystems/python-hydra-sdk?branch=master)
 
 This package provides a Python SDK
 for [Hydra](https://github.com/ory/hydra) OAuth2 and OpenID Connect
