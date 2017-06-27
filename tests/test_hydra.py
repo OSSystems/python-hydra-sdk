@@ -31,4 +31,4 @@ class HydraTestCase(unittest.TestCase):
 
         self.assertTrue(response)
         instrospection = self.hydra.instrospect_token(token)
-        self.assertIsNone(instrospection)
+        self.assertFalse(instrospection['active'])
