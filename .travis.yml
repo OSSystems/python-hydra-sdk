@@ -19,7 +19,7 @@ before_install:
     -e 'DATABASE_URL=memory'
     -e 'FORCE_ROOT_CLIENT_CREDENTIALS=client:secret'
     --entrypoint='/go/bin/hydra'
-    oryd/hydra
+    oryd/hydra:v0.9.16-http
     host --dangerous-force-http
 
 install: pip install tox python-coveralls

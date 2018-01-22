@@ -20,7 +20,7 @@ def hydra_fixture():
     ports = {'4444/tcp': 4444}
     entrypoint = '/go/bin/hydra host --dangerous-force-http'
     container = client.containers.run(
-        'oryd/hydra',
+        'oryd/hydra:v0.9.16-http',
         detach=True,
         environment=env,
         ports=ports,
