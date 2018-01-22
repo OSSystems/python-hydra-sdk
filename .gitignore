@@ -9,3 +9,4 @@ dist/*
 coverage.xml
 test-report.xml
 .tox
+venv*
