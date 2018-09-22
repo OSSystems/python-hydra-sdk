@@ -13,7 +13,7 @@ setup(
     install_requires=[
         'pycryptodome==3.6.6',
         'python-jose==1.3.2',
-        'requests==2.18.1',
+        'requests==2.19.1',
     ],
     author='O.S. Systems Software LTDA',
     author_email='contato@ossystems.com.br',
