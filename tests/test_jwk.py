@@ -5,7 +5,7 @@ import json
 import unittest
 from unittest.mock import patch
 
-from Crypto.PublicKey.RSA import _RSAobj
+from Crypto.PublicKey.RSA import RsaKey
 
 from hydra import Hydra, JWK
 from hydra.exceptions import HydraResponseError, HydraRequestError
@@ -55,8 +55,8 @@ class JWKTestCase(unittest.TestCase):
     def test_can_convert_to_RSA(self):
         jwk_public = JWK(**self.public_key)
         jwk_private = JWK(**self.private_key)
-        self.assertIsInstance(jwk_public.to_rsa(), _RSAobj)
-        self.assertIsInstance(jwk_private.to_rsa(), _RSAobj)
+        self.assertIsInstance(jwk_public.to_rsa(), RsaKey)
+        self.assertIsInstance(jwk_private.to_rsa(), RsaKey)
 
 
 class JWKManagerTestCase(unittest.TestCase):
