@@ -15,6 +15,16 @@ class Token:
         self.scope = kwargs.get('scope')
         self.token = kwargs.get('access_token')
         self.type = kwargs.get('token_type')
+        self.aud = kwargs.get('aud')
+        self.client_id = kwargs.get('client_id')
+        self.exp = kwargs.get('exp')
+        self.ext = kwargs.get('exp')
+        self.iat = kwargs.get('iat')
+        self.iss = kwargs.get('iss')
+        self.nbf = kwargs.get('nbf')
+        self.obfuscated_subject = kwargs.get('obfuscated_subject')
+        self.sub = kwargs.get('sub')
+        self.username = kwargs.get('username')
 
     def is_expired(self):
         expiration_date = self.issue_time + timedelta(seconds=self.expires_in)
@@ -26,16 +36,18 @@ class Token:
 
 class Client:
 
-    def __init__(self, host, client, secret):
-        self.host = host
+    def __init__(self, publichost, adminhost, client, secret):
+        self.publichost = publichost
+        self.adminhost = adminhost
         self.client = client
         self.secret = secret
         self._tokens = {}
 
     def request(self, method, path, token=True, **kwargs):
-        url = urljoin(self.host, path)
         if token:
+            url = urljoin(self.adminhost, path)
             return self._token_request(method, url, **kwargs)
+        url = urljoin(self.publichost, path)
         return self._basic_request(method, url, **kwargs)
 
     def _basic_request(self, method, url, **kwargs):
@@ -73,3 +85,29 @@ class Client:
         response = self.request(
             'POST', '/oauth2/revoke', token=False, data={'token': token.token})
         return response.ok
+
+    def get_login_request(self, challenge):
+        response = self.request(
+            'GET', '/oauth2/auth/requests/login/{}'.format(challenge))
+        if response.ok:
+            return response.json()
+
+    def get_consent_request(self, challenge):
+        response = self.request(
+            'GET', '/oauth2/auth/requests/consent/{}'.format(challenge))
+        if response.ok:
+            return response.json()
+
+    def accept_login_request(self, challenge, accept_login_config):
+        response = self.request(
+            'PUT', '/oauth2/auth/requests/login/{}/accept'.format(challenge),
+            json=accept_login_config)
+        if response.ok:
+            return response.json()
+
+    def accept_consent_request(self, challenge, accept_consent_config):
+        response = self.request(
+            'PUT', '/oauth2/auth/requests/consent/{}/accept'.format(challenge),
+            json=accept_consent_config)
+        if response.ok:
+            return response.json()

@@ -42,7 +42,8 @@ class ClientTestCase(unittest.TestCase):
 
     def setUp(self):
         self.data = {
-            'host': 'http://localhost',
+            'publichost': 'http://localhost:4444',
+            'adminhost': 'http://localhost:4445',
             'client': 'client',
             'secret': 'secret',
         }
@@ -53,10 +54,12 @@ class ClientTestCase(unittest.TestCase):
             'token_type': 'bearer'
         }
         self.token = Token(**self.token_response)
+        self.challenge = '0f4a657306bb476b9d95131d686d15ad'
 
     def test_can_create_client(self):
         c = Client(**self.data)
-        self.assertEqual(c.host, 'http://localhost')
+        self.assertEqual(c.publichost, 'http://localhost:4444')
+        self.assertEqual(c.adminhost, 'http://localhost:4445')
         self.assertEqual(c.client, 'client')
         self.assertEqual(c.secret, 'secret')
 
@@ -66,7 +69,7 @@ class ClientTestCase(unittest.TestCase):
         c.request(
             'POST', '/oauth2/token', token=False, json={'token': 'foobar'})
         request.assert_called_with(
-            'POST', 'http://localhost/oauth2/token',
+            'POST', 'http://localhost:4444/oauth2/token',
             auth=('client', 'secret'), json={'token': 'foobar'})
 
     @patch('requests.request')
@@ -76,7 +79,7 @@ class ClientTestCase(unittest.TestCase):
         c.request('GET', '/clients', token=True)
         headers = {'Authorization': 'bearer super-token'}
         request.assert_called_with(
-            'GET', 'http://localhost/clients', headers=headers)
+            'GET', 'http://localhost:4445/clients', headers=headers)
 
     @patch('requests.request')
     def test_can_get_access_token(self, request):
@@ -93,13 +96,13 @@ class ClientTestCase(unittest.TestCase):
         c = Client(**self.data)
         c.get_access_token()
         request.assert_called_with(
-            'POST', 'http://localhost/oauth2/token',
+            'POST', 'http://localhost:4444/oauth2/token',
             auth=(c.client, c.secret),
             data={'grant_type': 'client_credentials'})
 
         c.get_access_token('devices')
         request.assert_called_with(
-            'POST', 'http://localhost/oauth2/token',
+            'POST', 'http://localhost:4444/oauth2/token',
             auth=(c.client, c.secret),
             data={'grant_type': 'client_credentials', 'scope': 'devices'})
 
@@ -110,7 +113,7 @@ class ClientTestCase(unittest.TestCase):
         c.get_access_token()
         c.get_access_token()
         request.assert_called_once_with(
-            'POST', 'http://localhost/oauth2/token',
+            'POST', 'http://localhost:4444/oauth2/token',
             auth=(c.client, c.secret),
             data={'grant_type': 'client_credentials'})
 
@@ -122,7 +125,7 @@ class ClientTestCase(unittest.TestCase):
         headers = {'Authorization': 'bearer super-token'}
         data = {'token': 'super-token'}
         request.assert_called_with(
-            'POST', 'http://localhost/oauth2/introspect',
+            'POST', 'http://localhost:4445/oauth2/introspect',
             data=data, headers=headers)
 
     @patch('requests.request')
@@ -131,5 +134,59 @@ class ClientTestCase(unittest.TestCase):
         c.revoke_token(self.token)
         data = {'token': 'super-token'}
         request.assert_called_with(
-            'POST', 'http://localhost/oauth2/revoke',
+            'POST', 'http://localhost:4444/oauth2/revoke',
             data=data, auth=('client', 'secret'))
+
+    @patch('requests.request')
+    def test_can_get_login_request(self, request):
+        c = Client(**self.data)
+        c.get_login_request(self.challenge)
+        request.assert_called_with(
+            'GET',
+            'http://localhost:4445/oauth2/auth/requests/login/{}'
+            .format(self.challenge),
+            headers={'Authorization': 'None None'})
+
+    @patch('requests.request')
+    def test_can_accept_login_request(self, request):
+        c = Client(**self.data)
+        accept_config = {
+            'remember_for': 0,
+            'remember': False,
+            'subject': c.client
+        }
+        c.accept_login_request(self.challenge, accept_config)
+        request.assert_called_with(
+            'PUT',
+            'http://localhost:4445/oauth2/auth/requests/login/{}/accept'
+            .format(self.challenge),
+            headers={'Authorization': 'None None'},
+            json=accept_config)
+
+    @patch('requests.request')
+    def test_can_get_consent_request(self, request):
+        c = Client(**self.data)
+        c.get_consent_request(self.challenge)
+        request.assert_called_with(
+            'GET',
+            'http://localhost:4445/oauth2/auth/requests/consent/{}'
+            .format(self.challenge),
+            headers={'Authorization': 'None None'})
+
+    @patch('requests.request')
+    def test_can_accept_consent_request(self, request):
+        c = Client(**self.data)
+        accept_config = {
+            'remember_for': 0,
+            'remember': False,
+            'session': {
+                'access_token': self.token.ext
+            },
+        }
+        c.accept_consent_request(self.challenge, accept_config)
+        request.assert_called_with(
+            'PUT',
+            'http://localhost:4445/oauth2/auth/requests/consent/{}/accept'
+            .format(self.challenge),
+            headers={'Authorization': 'None None'},
+            json=accept_config)
