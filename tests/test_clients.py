@@ -9,7 +9,8 @@ from hydra import Hydra, Client
 class ClientsTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.hydra = Hydra('http://localhost:4444', 'client', 'secret')
+        self.hydra = Hydra('http://localhost:4444', 'http://localhost:4445',
+                           'client', 'secret')
         self.client = Client(
             name='new-client',
             secret='client-secret',

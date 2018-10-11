@@ -18,13 +18,22 @@ Documentation is still in progress...
 from hydra import Hydra
 
 # First, create a Hydra client
-hydra = Hydra(host='http://localhost:4444', client='client_id', secret='client_secret')
+hydra = Hydra(publichost='http://localhost:4444',adminhost='http://localhost:4445', client='client-server', secret='secret-server')
 
 # Get an access token
-token = hydra.get_access_token(scope=['hydra'])
+token = hydra.get_access_token()
+
+# Create a client
+client = Client(
+    name='new-client',
+    secret='client-secret',
+    scopes=['devices', 'products'],
+    redirect_uris=['http://localhost/callback'],
+)
+client_id = hydra.clients.create(client).id
 
 # Get a client
-client = hydra.clients.get('admin')
+client = hydra.clients.get(cliente_id)
 ```
 
 ## Covered API
@@ -36,23 +45,18 @@ already developed in the following list:
   - [x] Get access token (with token cache)
   - [x] Introspect token
   - [x] Revoke token
+- Login
+  - [x] Get login challenge
+  - [x] Accept login challenge
 - Consent
-  - [x] Decode consent challenge
-  - [x] Encode consent response
+  - [x] Get consent challenge
+  - [x] Accept consent response
 - Clients
   - [x] Create new client
   - [x] Retrieve client information
   - [x] List all clients
   - [x] Update client
   - [x] Delete client
-- JWK
-  - [ ] Get JWK set
-  - [ ] Generate JWK set
-  - [ ] Upload JWK set
-  - [ ] Delete JWK set
-  - [x] Get JWK key
-  - [ ] Set JWK key
-  - [ ] Delete JWK key
 - Policies
   - [ ] Create new policy
   - [ ] Retrieve policy details

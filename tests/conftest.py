@@ -5,6 +5,8 @@ import os
 
 import docker
 import pytest
+import tempfile
+import shutil
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -12,23 +14,39 @@ def hydra_fixture():
     if os.environ.get('PYTHON_HYDRA_LOCAL'):
         yield
         return
+
     client = docker.from_env()
-    env = {
-        'FORCE_ROOT_CLIENT_CREDENTIALS': 'client:secret',
-        'DATABASE_URL': 'memory',
-    }
-    ports = {'4444/tcp': 4444}
-    entrypoint = '/go/bin/hydra host --dangerous-force-http'
-    container = client.containers.run(
-        'oryd/hydra:v0.9.16-http',
+
+    container_hydra_server = client.containers.run(
+        'oryd/hydra:v1.0.0-beta.9',
+        name='hydra_server',
         detach=True,
-        environment=env,
-        ports=ports,
-        entrypoint=entrypoint,
+        environment={'DATABASE_URL': 'memory'},
+        ports={'4444/tcp': 4444, '4445/tcp': 4445},
+        command='serve all --dangerous-force-http',
+        entrypoint='hydra',
+        auto_remove=True
     )
-    for line in container.logs(stream=True):
+    for line in container_hydra_server.logs(stream=True):
         if b'Setting up http server on :4444' in line:
             break
+
+    container_add_client = client.containers.run(
+        'oryd/hydra:v1.0.0-beta.9',
+        environment={'HYDRA_ADMIN_URL': 'http://hydra:4445'},
+        detach=True,
+        links={'hydra_server': 'hydra'},
+        command='clients create --skip-tls-verify '
+        '--id client --secret secret '
+        '--grant-types client_credentials,authorization_code '
+        '--response-types token,code '
+        '--scope hydra.keys.get,hydra.clients',
+        auto_remove=True
+    )
+    for line in container_add_client.logs(stream=True):
+        if b'OAuth2 client id: client' in line:
+            container_add_client.kill()
+            break
     yield
-    container.kill()
-    container.remove()
+
+    container_hydra_server.kill()
