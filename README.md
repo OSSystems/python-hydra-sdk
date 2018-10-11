@@ -36,23 +36,18 @@ already developed in the following list:
   - [x] Get access token (with token cache)
   - [x] Introspect token
   - [x] Revoke token
+- Login
+  - [x] Get login challenge
+  - [x] Accept login challenge
 - Consent
-  - [x] Decode consent challenge
-  - [x] Encode consent response
+  - [x] Get consent challenge
+  - [x] Accept consent response
 - Clients
   - [x] Create new client
   - [x] Retrieve client information
   - [x] List all clients
   - [x] Update client
   - [x] Delete client
-- JWK
-  - [ ] Get JWK set
-  - [ ] Generate JWK set
-  - [ ] Upload JWK set
-  - [ ] Delete JWK set
-  - [x] Get JWK key
-  - [ ] Set JWK key
-  - [ ] Delete JWK key
 - Policies
   - [ ] Create new policy
   - [ ] Retrieve policy details

@@ -7,24 +7,31 @@ from .base import HydraManager
 class Client:
 
     def __init__(self, **kwargs):
-        self.id = kwargs.get('id')
-        self.owner = kwargs.get('owner')
+        self.id = kwargs.get('client_id')
         self.name = kwargs.get('name') or kwargs.get('client_name')
         self.secret = kwargs.get('secret') or kwargs.get('client_secret')
+        self.client_secret_expires_at = kwargs.get('client_secret_expires_at')
         self.uri = kwargs.get('uri') or kwargs.get('client_uri')
-        self.policy_uri = kwargs.get('policy_uri')
-        self.tos_uri = kwargs.get('tos_uri')
-        self.logo_uri = kwargs.get('logo_uri')
         self.contacts = kwargs.get('contacts')
-        self.redirect_uris = kwargs.get('redirect_uris')
         self.grant_types = kwargs.get('grant_types')
+        self.logo_uri = kwargs.get('logo_uri')
+        self.owner = kwargs.get('owner')
+        self.policy_uri = kwargs.get('policy_uri')
+        self.redirect_uris = kwargs.get('redirect_uris')
         self.response_types = kwargs.get('response_types')
-        self.is_public = kwargs.get('public')
         self.scopes = kwargs.get('scope', '').split() or kwargs.get('scopes', [])  # nopep8
+        self.sector_identifier_uri = kwargs.get('sector_identifier_uri')
+        self.subject_type = kwargs.get('subject_type')
+        self.token_endpoint_auth_method = kwargs.get(
+            'token_endpoint_auth_method')
+        self.tos_uri = kwargs.get('tos_uri')
+        self.userinfo_signed_response_alg = kwargs.get(
+            'userinfo_signed_response_alg')
 
     def as_dict(self):
         data = {
-            'id': self.id,
+            'client_id': self.id,
+            'client_secret_expires_at': self.client_secret_expires_at,
             'owner': self.owner,
             'client_name': self.name,
             'client_secret': self.secret,
@@ -37,7 +44,10 @@ class Client:
             'redirect_uris': self.redirect_uris,
             'grant_types': self.grant_types,
             'response_types': self.response_types,
-            'public': self.is_public,
+            'sector_identifier_uri': self.sector_identifier_uri,
+            'subject_type': self.subject_type,
+            'token_endpoint_auth_method': self.token_endpoint_auth_method,
+            'userinfo_signed_response_alg': self.userinfo_signed_response_alg
         }
         return {k: v for k, v in data.items() if v is not None}
 
@@ -72,4 +82,4 @@ class ClientManager(HydraManager):
     def all(self):
         response = self.hydra.request('GET', '/clients', scope=self.SCOPE)
         if response.ok:
-            return [Client(**data) for data in response.json().values()]
+            return [Client(**data) for data in response.json()]

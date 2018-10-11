@@ -10,20 +10,21 @@ from hydra import Hydra
 class HydraTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.hydra = Hydra('http://localhost:4444', 'client', 'secret')
+        self.hydra = Hydra('http://localhost:9000', 'http://localhost:9001',
+                           'client', 'secret')
 
     def test_can_retrieve_access_token(self):
         token = self.hydra.get_access_token()
         self.assertIsNotNone(token)
 
     def test_can_instropect_token(self):
-        token = self.hydra.get_access_token('hydra')
+        token = self.hydra.get_access_token()
         result = self.hydra.instrospect_token(token)
         self.assertIsNotNone(result)
         self.assertTrue(result['active'])
 
     def test_can_revoke_token(self):
-        token = self.hydra.get_access_token('hydra')
+        token = self.hydra.get_access_token()
         instrospection = self.hydra.instrospect_token(token)
         self.assertTrue(instrospection['active'])
 
