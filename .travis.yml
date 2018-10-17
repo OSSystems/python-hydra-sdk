@@ -15,12 +15,19 @@ env:
 before_install:
   - >
     docker run -d
-    -p 4444:4444
+    -p 4444:9000
+    -p 4445:9001
+    --name hydra
     -e 'DATABASE_URL=memory'
-    -e 'FORCE_ROOT_CLIENT_CREDENTIALS=client:secret'
-    --entrypoint='/go/bin/hydra'
-    oryd/hydra:v0.9.16-http
-    host --dangerous-force-http
+    --entrypoint=hydra
+    oryd/hydra:v1.0.0-beta.9
+    serve all --dangerous-force-http
+  - >
+    docker run -d
+    -e 'HYDRA_ADMIN_URL=http://hydra:4445'
+    --link hydra:hydra
+    oryd/hydra:v1.0.0-beta.9
+    clients create --skip-tls-verify --id client --secret secret --grant-types client_credentials,authorization_code --response-types token,code --scope hydra.keys.get,hydra.clients
 
 install: pip install tox python-coveralls
 

@@ -9,7 +9,8 @@ from hydra import Hydra, Client
 class ClientsTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.hydra = Hydra('http://localhost:4444', 'client', 'secret')
+        self.hydra = Hydra('http://localhost:9000', 'http://localhost:9001',
+                           'client', 'secret')
         self.client = Client(
             name='new-client',
             secret='client-secret',
@@ -42,7 +43,6 @@ class ClientsTestCase(unittest.TestCase):
     def test_can_delete_client(self):
         client = self.hydra.clients.create(self.client)
         self.addCleanup(self.hydra.clients.delete, client_id=client.id)
-
         self.assertIsNotNone(self.hydra.clients.get(client.id))
         self.hydra.clients.delete(client.id)
         self.assertIsNone(self.hydra.clients.get(client.id))
