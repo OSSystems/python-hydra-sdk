@@ -8,7 +8,7 @@ setup(
     name='hydra-sdk',
     description='Go Hydra SDK for Python',
     keywords='hydra oauth2 openid go',
-    version='v1.0.0-beta.9',
+    version='1.0.0',
     packages=['hydra'],
     install_requires=[
         'pycryptodome==3.6.6',
