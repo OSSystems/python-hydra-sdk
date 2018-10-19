@@ -12,7 +12,7 @@ setup(
     packages=['hydra'],
     install_requires=[
         'pycryptodome==3.6.6',
-        'requests==2.19.1',
+        'requests==2.20.0',
     ],
     author='O.S. Systems Software LTDA',
     author_email='contato@ossystems.com.br',
