@@ -11,7 +11,6 @@ setup(
     version='1.0.0',
     packages=['hydra'],
     install_requires=[
-        'pycryptodome==3.6.6',
         'requests==2.20.0',
     ],
     author='O.S. Systems Software LTDA',
