@@ -67,9 +67,10 @@ class ClientTestCase(unittest.TestCase):
     def test_request_with_basic_authentication(self, request):
         c = Client(**self.data)
         c.request(
-            'POST', '/oauth2/token', token=False, json={'token': 'foobar'})
+            'POST', '/oauth2/token', token=False,
+            auth=('client', 'secret'), json={'token': 'foobar'})
         request.assert_called_with(
-            'POST', 'http://localhost:4444/oauth2/token',
+            'POST', 'http://localhost:4445/oauth2/token',
             auth=('client', 'secret'), json={'token': 'foobar'})
 
     @patch('requests.request')
@@ -77,9 +78,9 @@ class ClientTestCase(unittest.TestCase):
         request.return_value.json.return_value = self.token_response
         c = Client(**self.data)
         c.request('GET', '/clients', token=True)
-        headers = {'Authorization': 'bearer super-token'}
+        auth = ('client', 'secret')
         request.assert_called_with(
-            'GET', 'http://localhost:4445/clients', headers=headers)
+            'GET', 'http://localhost:4444/clients', auth=auth)
 
     @patch('requests.request')
     def test_can_get_access_token(self, request):
@@ -122,20 +123,20 @@ class ClientTestCase(unittest.TestCase):
         request.return_value.json.return_value = self.token_response
         c = Client(**self.data)
         c.instrospect_token(self.token)
-        headers = {'Authorization': 'bearer super-token'}
         data = {'token': 'super-token'}
         request.assert_called_with(
             'POST', 'http://localhost:4445/oauth2/introspect',
-            data=data, headers=headers)
+            data=data)
 
     @patch('requests.request')
     def test_can_revoke_token(self, request):
         c = Client(**self.data)
         c.revoke_token(self.token)
         data = {'token': 'super-token'}
+        auth = ('client', 'secret')
         request.assert_called_with(
             'POST', 'http://localhost:4444/oauth2/revoke',
-            data=data, auth=('client', 'secret'))
+            data=data, auth=auth)
 
     @patch('requests.request')
     def test_can_get_login_request(self, request):
@@ -144,8 +145,7 @@ class ClientTestCase(unittest.TestCase):
         request.assert_called_with(
             'GET',
             'http://localhost:4445/oauth2/auth/requests/login/{}'
-            .format(self.challenge),
-            headers={'Authorization': 'None None'})
+            .format(self.challenge))
 
     @patch('requests.request')
     def test_can_accept_login_request(self, request):
@@ -160,7 +160,6 @@ class ClientTestCase(unittest.TestCase):
             'PUT',
             'http://localhost:4445/oauth2/auth/requests/login/{}/accept'
             .format(self.challenge),
-            headers={'Authorization': 'None None'},
             json=accept_config)
 
     @patch('requests.request')
@@ -170,8 +169,7 @@ class ClientTestCase(unittest.TestCase):
         request.assert_called_with(
             'GET',
             'http://localhost:4445/oauth2/auth/requests/consent/{}'
-            .format(self.challenge),
-            headers={'Authorization': 'None None'})
+            .format(self.challenge))
 
     @patch('requests.request')
     def test_can_accept_consent_request(self, request):
@@ -188,5 +186,4 @@ class ClientTestCase(unittest.TestCase):
             'PUT',
             'http://localhost:4445/oauth2/auth/requests/consent/{}/accept'
             .format(self.challenge),
-            headers={'Authorization': 'None None'},
             json=accept_config)
