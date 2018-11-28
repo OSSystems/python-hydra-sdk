@@ -54,32 +54,32 @@ class Client:
 
 class ClientManager(HydraManager):
 
-    SCOPE = 'hydra.clients'
+    # SCOPE = 'hydra.clients'
 
     def create(self, client):
         response = self.hydra.request(
-            'POST', '/clients', scope=self.SCOPE, json=client.as_dict())
+            'POST', '/clients', json=client.as_dict())
         if response.ok:
             return Client(**response.json())
 
     def get(self, client_id):
         path = '/clients/{}'.format(client_id)
-        response = self.hydra.request('GET', path, scope=self.SCOPE)
+        response = self.hydra.request('GET', path)
         if response.ok:
             return Client(**response.json())
 
     def update(self, client):
         path = '/clients/{}'.format(client.id)
         response = self.hydra.request(
-            'PUT', path, scope=self.SCOPE, json=client.as_dict())
+            'PUT', path, json=client.as_dict())
         if response.ok:
             return Client(**response.json())
 
     def delete(self, client_id):
         path = '/clients/{}'.format(client_id)
-        self.hydra.request('DELETE', path, scope=self.SCOPE)
+        self.hydra.request('DELETE', path)
 
     def all(self):
-        response = self.hydra.request('GET', '/clients', scope=self.SCOPE)
+        response = self.hydra.request('GET', '/clients')
         if response.ok:
             return [Client(**data) for data in response.json()]

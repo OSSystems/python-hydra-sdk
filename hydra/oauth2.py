@@ -43,21 +43,18 @@ class Client:
         self.secret = secret
         self._tokens = {}
 
-    def request(self, method, path, token=True, **kwargs):
+    def request(self, method, path, token=False, **kwargs):
         if token:
-            url = urljoin(self.adminhost, path)
+            url = urljoin(self.publichost, path)
             return self._token_request(method, url, **kwargs)
-        url = urljoin(self.publichost, path)
-        return self._basic_request(method, url, **kwargs)
+        url = urljoin(self.adminhost, path)
+        return self._admin_request(method, url, **kwargs)
 
-    def _basic_request(self, method, url, **kwargs):
-        kwargs['auth'] = (self.client, self.secret)
+    def _admin_request(self, method, url, **kwargs):
         return requests.request(method, url, **kwargs)
 
     def _token_request(self, method, url, scope=None, **kwargs):
-        token = self.get_access_token(scope)
-        headers = kwargs.setdefault('headers', {})
-        headers['Authorization'] = str(token)
+        kwargs['auth'] = (self.client, self.secret)
         return requests.request(method, url, **kwargs)
 
     def get_access_token(self, scope=None):
@@ -68,8 +65,9 @@ class Client:
 
         if scope is not None:
             data['scope'] = scope
-        response = self.request(
-            'POST', '/oauth2/token', token=False, data=data)
+        response = requests.request(
+            'POST', urljoin(self.publichost, '/oauth2/token'),
+            auth=(self.client, self.secret), data=data)
         if response.ok:
             token = Token(**response.json())
             self._tokens[scope] = token
@@ -83,7 +81,7 @@ class Client:
 
     def revoke_token(self, token):
         response = self.request(
-            'POST', '/oauth2/revoke', token=False, data={'token': token.token})
+            'POST', '/oauth2/revoke', token=True, data={'token': token.token})
         return response.ok
 
     def get_login_request(self, challenge):
