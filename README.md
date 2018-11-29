@@ -63,16 +63,16 @@ already developed in the following list:
   - [ ] Delete a JSON Web Key
   - [x] Get consent request information
   - [x] Accept an consent request
-  - [ ] Reject an consent request
+  - [x] Reject an consent request
   - [x] Get an login request
   - [x] Accept an login request
-  - [ ] Reject a login request
-  - [ ] Lists all consent sessions of a user
-  - [ ] Revokes all previous consent sessions of a user
-  - [ ] Revokes consent sessions of a user for a specific OAuth 2.0 Client
-  - [ ] Logs user out by deleting the session cookie
-  - [ ] Invalidates a user's authentication session
-  - [ ] Flush Expired OAuth2 Access Tokens
+  - [x] Reject a login request
+  - [x] Lists all consent sessions of a user
+  - [x] Revokes all previous consent sessions of a user
+  - [x] Revokes consent sessions of a user for a specific OAuth 2.0 Client
+  - [x] Logs user out by deleting the session cookie
+  - [x] Invalidates a user's authentication session
+  - [x] Flush Expired OAuth2 Access Tokens
   - [x] Introspect OAuth2 tokens
 
 ## License

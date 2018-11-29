@@ -109,3 +109,55 @@ class Client:
             json=accept_consent_config)
         if response.ok:
             return response.json()
+
+    def reject_login_request(self, challenge, reject_login_config):
+        response = self.request(
+            'PUT', '/oauth2/auth/requests/login/{}/reject'.format(challenge),
+            json=reject_login_config)
+        if response.ok:
+            return response.json()
+
+    def reject_consent_request(self, challenge, reject_consent_config):
+        response = self.request(
+            'PUT', '/oauth2/auth/requests/consent/{}/reject'.format(challenge),
+            json=reject_consent_config)
+        if response.ok:
+            return response.json()
+
+    def revokes_all_previous_consent_session_user(self, user):
+        response = self.request(
+            'DELETE', '/oauth2/auth/sessions/consent/{}'
+            .format(user))
+        if response.ok:
+            response.json()
+
+    def revokes_consent_sessions_oAuth2_client(self, user, client):
+        response = self.request(
+            'DELETE', '/oauth2/auth/sessions/consent/{}/{}'
+            .format(user, client))
+        return response.ok
+
+    def lists_all_consent_sessions_user(self, user):
+        response = self.request(
+            'GET', '/oauth2/auth/sessions/consent/{}' .format(user))
+        if response.ok:
+            return response.json()
+
+    def logs_user_out_deleting_session_cookie(self):
+        response = self.request(
+            'GET', '/oauth2/auth/sessions/login/revoke')
+        if response.ok:
+            return response.json()
+
+    def invalidates_users_authentication_session(self, user):
+        response = self.request(
+            'DELETE', '/oauth2/auth/sessions/login/{}' .format(user))
+        print(response)
+        if response.ok:
+            return response
+
+    def flush_expired_oAuth2_access_tokens(self, not_after):
+        response = self.request(
+            'POST', '/oauth2/flush', json=not_after)
+        if response.ok:
+            return response

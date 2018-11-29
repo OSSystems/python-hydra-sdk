@@ -187,3 +187,77 @@ class ClientTestCase(unittest.TestCase):
             'http://localhost:4445/oauth2/auth/requests/consent/{}/accept'
             .format(self.challenge),
             json=accept_config)
+
+    @patch('requests.request')
+    def test_can_reject_login_request(self, request):
+        c = Client(**self.data)
+        reject_config = {
+            'error': 'test',
+            'error_debug': 'test',
+            'error_description': 'test',
+            'error_hint': 'test',
+            'status_code': 404
+        }
+        c.reject_login_request(self.challenge, reject_config)
+        request.assert_called_once_with(
+            'PUT',
+            'http://localhost:4445/oauth2/auth/requests/login/{}/reject'
+            .format(self.challenge),
+            json=reject_config)
+
+    @patch('requests.request')
+    def test_can_reject_consent_request(self, request):
+        c = Client(**self.data)
+        reject_config = {
+            'error': 'test',
+            'error_debug': 'test',
+            'error_description': 'test',
+            'error_hint': 'test',
+            'status_code': 404
+        }
+        c.reject_consent_request(self.challenge, reject_config)
+        request.assert_called_once_with(
+            'PUT',
+            'http://localhost:4445/oauth2/auth/requests/consent/{}/reject'
+            .format(self.challenge),
+            json=reject_config)
+
+    @patch('requests.request')
+    def test_can_revokes_all_previous_consent_session_user(self, request):
+        c = Client(**self.data)
+        user = 'user'
+        c.revokes_all_previous_consent_session_user(user)
+        request.assert_called_once_with(
+            'DELETE',
+            'http://localhost:4445/oauth2/auth/sessions/consent/{}'
+            .format(user)
+        )
+
+    @patch('requests.request')
+    def test_can_revoke_consent_sessions_oAuth2_client(self, request):
+        c = Client(**self.data)
+        user = 'user'
+        client = c.client
+        c.revokes_consent_sessions_oAuth2_client(user, c.client)
+        request.assert_called_with(
+            'DELETE',
+            'http://localhost:4445/oauth2/auth/sessions/consent/{}/{}'
+            .format(user, client))
+
+    @patch('requests.request')
+    def test_can_lists_all_consent_sessions_user(self, request):
+        c = Client(**self.data)
+        user = 'user'
+        c.lists_all_consent_sessions_user(user)
+        request.assert_called_once_with(
+            'GET',
+            'http://localhost:4445/oauth2/auth/sessions/consent/{}'
+            .format(user))
+
+    @patch('requests.request')
+    def test_can_logs_user_out_deleting_session_cookie(self, request):
+        c = Client(**self.data)
+        c.logs_user_out_deleting_session_cookie()
+        request.assert_called_once_with(
+            'GET',
+            'http://localhost:4445/oauth2/auth/sessions/login/revoke')
