@@ -83,42 +83,6 @@ class ClientTestCase(unittest.TestCase):
             'GET', 'http://localhost:4444/clients', auth=auth)
 
     @patch('requests.request')
-    def test_can_get_access_token(self, request):
-        request.return_value.json.return_value = self.token_response
-        c = Client(**self.data)
-        token = c.get_access_token('devices')
-        self.assertEqual(token.scope, 'devices')
-        self.assertEqual(token.expires_in, 10)
-        self.assertEqual(token.token, 'super-token')
-        self.assertEqual(token.type, 'bearer')
-
-    @patch('requests.request')
-    def test_get_access_token_request_is_made_correctly(self, request):
-        c = Client(**self.data)
-        c.get_access_token()
-        request.assert_called_with(
-            'POST', 'http://localhost:4444/oauth2/token',
-            auth=(c.client, c.secret),
-            data={'grant_type': 'client_credentials'})
-
-        c.get_access_token('devices')
-        request.assert_called_with(
-            'POST', 'http://localhost:4444/oauth2/token',
-            auth=(c.client, c.secret),
-            data={'grant_type': 'client_credentials', 'scope': 'devices'})
-
-    @patch('requests.request')
-    def test_can_get_cached_token(self, request):
-        request.return_value.json.return_value = self.token_response
-        c = Client(**self.data)
-        c.get_access_token()
-        c.get_access_token()
-        request.assert_called_once_with(
-            'POST', 'http://localhost:4444/oauth2/token',
-            auth=(c.client, c.secret),
-            data={'grant_type': 'client_credentials'})
-
-    @patch('requests.request')
     def test_can_instrospect_token(self, request):
         request.return_value.json.return_value = self.token_response
         c = Client(**self.data)
