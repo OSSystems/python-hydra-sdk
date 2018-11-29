@@ -46,14 +46,14 @@ class Client:
     def request(self, method, path, token=False, **kwargs):
         if token:
             url = urljoin(self.publichost, path)
-            return self._token_request(method, url, **kwargs)
+            return self._basic_request(method, url, **kwargs)
         url = urljoin(self.adminhost, path)
         return self._admin_request(method, url, **kwargs)
 
     def _admin_request(self, method, url, **kwargs):
         return requests.request(method, url, **kwargs)
 
-    def _token_request(self, method, url, scope=None, **kwargs):
+    def _basic_request(self, method, url, scope=None, **kwargs):
         kwargs['auth'] = (self.client, self.secret)
         return requests.request(method, url, **kwargs)
 
