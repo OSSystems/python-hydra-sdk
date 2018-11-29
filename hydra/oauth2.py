@@ -57,22 +57,6 @@ class Client:
         kwargs['auth'] = (self.client, self.secret)
         return requests.request(method, url, **kwargs)
 
-    def get_access_token(self, scope=None):
-        token = self._tokens.get(scope)
-        if token is not None and not token.is_expired():
-            return token
-        data = {'grant_type': 'client_credentials'}
-
-        if scope is not None:
-            data['scope'] = scope
-        response = requests.request(
-            'POST', urljoin(self.publichost, '/oauth2/token'),
-            auth=(self.client, self.secret), data=data)
-        if response.ok:
-            token = Token(**response.json())
-            self._tokens[scope] = token
-            return token
-
     def instrospect_token(self, token):
         response = self.request(
             'POST', '/oauth2/introspect', data={'token': token.token})
