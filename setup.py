@@ -11,7 +11,7 @@ setup(
     version='1.0.1',
     packages=['hydra'],
     install_requires=[
-        'requests==2.20.1',
+        'requests==2.21.0',
     ],
     author='O.S. Systems Software LTDA',
     author_email='contato@ossystems.com.br',
