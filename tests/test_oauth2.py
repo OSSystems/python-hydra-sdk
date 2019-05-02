@@ -108,8 +108,8 @@ class ClientTestCase(unittest.TestCase):
         c.get_login_request(self.challenge)
         request.assert_called_with(
             'GET',
-            'http://localhost:4445/oauth2/auth/requests/login/{}'
-            .format(self.challenge))
+            'http://localhost:4445/oauth2/auth/requests/login',
+            params={'login_challenge': self.challenge})
 
     @patch('requests.request')
     def test_can_accept_login_request(self, request):
@@ -122,8 +122,8 @@ class ClientTestCase(unittest.TestCase):
         c.accept_login_request(self.challenge, accept_config)
         request.assert_called_with(
             'PUT',
-            'http://localhost:4445/oauth2/auth/requests/login/{}/accept'
-            .format(self.challenge),
+            'http://localhost:4445/oauth2/auth/requests/login/accept',
+            params={'login_challenge': self.challenge},
             json=accept_config)
 
     @patch('requests.request')
@@ -132,8 +132,8 @@ class ClientTestCase(unittest.TestCase):
         c.get_consent_request(self.challenge)
         request.assert_called_with(
             'GET',
-            'http://localhost:4445/oauth2/auth/requests/consent/{}'
-            .format(self.challenge))
+            'http://localhost:4445/oauth2/auth/requests/consent',
+            params={'consent_challenge': self.challenge})
 
     @patch('requests.request')
     def test_can_accept_consent_request(self, request):
@@ -148,8 +148,8 @@ class ClientTestCase(unittest.TestCase):
         c.accept_consent_request(self.challenge, accept_config)
         request.assert_called_with(
             'PUT',
-            'http://localhost:4445/oauth2/auth/requests/consent/{}/accept'
-            .format(self.challenge),
+            'http://localhost:4445/oauth2/auth/requests/consent/accept',
+            params={'consent_challenge': self.challenge},
             json=accept_config)
 
     @patch('requests.request')
@@ -165,8 +165,8 @@ class ClientTestCase(unittest.TestCase):
         c.reject_login_request(self.challenge, reject_config)
         request.assert_called_once_with(
             'PUT',
-            'http://localhost:4445/oauth2/auth/requests/login/{}/reject'
-            .format(self.challenge),
+            'http://localhost:4445/oauth2/auth/requests/login/reject',
+            params={'login_challenge': self.challenge},
             json=reject_config)
 
     @patch('requests.request')
@@ -182,8 +182,8 @@ class ClientTestCase(unittest.TestCase):
         c.reject_consent_request(self.challenge, reject_config)
         request.assert_called_once_with(
             'PUT',
-            'http://localhost:4445/oauth2/auth/requests/consent/{}/reject'
-            .format(self.challenge),
+            'http://localhost:4445/oauth2/auth/requests/consent/reject',
+            params={'consent_challenge': self.challenge},
             json=reject_config)
 
     @patch('requests.request')
@@ -193,8 +193,8 @@ class ClientTestCase(unittest.TestCase):
         c.revokes_all_previous_consent_session_user(user)
         request.assert_called_once_with(
             'DELETE',
-            'http://localhost:4445/oauth2/auth/sessions/consent/{}'
-            .format(user)
+            'http://localhost:4445/oauth2/auth/sessions/consent',
+            params={'subject': user}
         )
 
     @patch('requests.request')
@@ -205,8 +205,8 @@ class ClientTestCase(unittest.TestCase):
         c.revokes_consent_sessions_oAuth2_client(user, c.client)
         request.assert_called_with(
             'DELETE',
-            'http://localhost:4445/oauth2/auth/sessions/consent/{}/{}'
-            .format(user, client))
+            'http://localhost:4445/oauth2/auth/sessions/consent',
+            params={'subject': user, 'client': client})
 
     @patch('requests.request')
     def test_can_lists_all_consent_sessions_user(self, request):
@@ -215,8 +215,8 @@ class ClientTestCase(unittest.TestCase):
         c.lists_all_consent_sessions_user(user)
         request.assert_called_once_with(
             'GET',
-            'http://localhost:4445/oauth2/auth/sessions/consent/{}'
-            .format(user))
+            'http://localhost:4445/oauth2/auth/sessions/consent',
+            params={'subject': user})
 
     @patch('requests.request')
     def test_can_logs_user_out_deleting_session_cookie(self, request):

@@ -23,14 +23,14 @@ before_install:
     --name=hydra
     -e DATABASE_URL=memory
     --entrypoint=hydra
-    oryd/hydra:v1.0.0-rc.2_oryOS.9
+    oryd/hydra:v1.0.0-rc.11
     serve all --dangerous-force-http
   - sleep 10
   - >
     docker run -it
     -e HYDRA_ADMIN_URL=http://hydra:4445
     --link=hydra:hydra
-    oryd/hydra:v1.0.0-rc.2_oryOS.9
+    oryd/hydra:v1.0.0-rc.11
     clients create --skip-tls-verify
     --id client
     --secret secret

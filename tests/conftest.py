@@ -18,7 +18,7 @@ def hydra_fixture():
     client = docker.from_env()
 
     container_hydra_server = client.containers.run(
-        'oryd/hydra:v1.0.0-beta.9',
+        'oryd/hydra:v1.0.0-rc.11',
         name='hydra_server',
         detach=True,
         environment={'DATABASE_URL': 'memory'},
@@ -32,7 +32,7 @@ def hydra_fixture():
             break
 
     container_add_client = client.containers.run(
-        'oryd/hydra:v1.0.0-beta.9',
+        'oryd/hydra:v1.0.0-rc.11',
         environment={'HYDRA_ADMIN_URL': 'http://hydra:4445'},
         detach=True,
         links={'hydra_server': 'hydra'},
